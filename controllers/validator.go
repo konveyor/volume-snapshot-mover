@@ -2,8 +2,8 @@ package controllers
 
 import (
 	"errors"
+
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	"strconv"
 
 	"github.com/go-logr/logr"
 	volsnapmoverv1alpha1 "github.com/konveyor/volume-snapshot-mover/api/v1alpha1"
@@ -38,12 +38,12 @@ func (r *VolumeSnapshotBackupReconciler) ValidateVolumeSnapshotMoverBackup(log l
 		return false, err
 	}
 
-	hasOneDefaultVSClass, err := r.checkForOneDefaultSnapClass(log)
+	hasOneDefaultVSClass, err := r.checkForOneDefaultVSBSnapClass(log)
 	if !hasOneDefaultVSClass {
 		return false, err
 	}
 
-	hasOneDefaultStorageClass, err := r.checkForOneDefaultStorageClass(log)
+	hasOneDefaultStorageClass, err := r.checkForOneDefaultVSBStorageClass(log)
 	if !hasOneDefaultStorageClass {
 		return false, err
 	}
@@ -84,11 +84,22 @@ func (r *VolumeSnapshotRestoreReconciler) ValidateVolumeSnapshotMoverRestore(log
 	if len(vsr.Spec.ProtectedNamespace) == 0 {
 		return false, errors.New("VolumeSnapshotRestore CR protected ns cannot be empty")
 	}
+
+	hasOneDefaultVSClass, err := r.checkForOneDefaultVSRSnapClass(log)
+	if !hasOneDefaultVSClass {
+		return false, err
+	}
+
+	hasOneDefaultStorageClass, err := r.checkForOneDefaultVSRStorageClass(log)
+	if !hasOneDefaultStorageClass {
+		return false, err
+	}
+
 	r.Log.Info("returning true In function ValidateVolumeSnapshotMoverRestore")
 	return true, nil
 }
 
-func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultSnapClass(log logr.Logger) (bool, error) {
+func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultVSBSnapClass(log logr.Logger) (bool, error) {
 
 	vsClassList := snapv1.VolumeSnapshotClassList{}
 	vsClassOptions := []client.ListOption{}
@@ -98,27 +109,16 @@ func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultSnapClass(log logr.Lo
 		return false, err
 	}
 
-	numDefaultClasses := 0
-	for _, vsClass := range vsClassList.Items {
-
-		isDefaultClass, _ := vsClass.Annotations[volumeSnapshotClassDefaultKey]
-		boolIsDefault, _ := strconv.ParseBool(isDefaultClass)
-
-		// found a default volumeSnapshotClass
-		if boolIsDefault {
-			numDefaultClasses++
-		}
-
-		if numDefaultClasses > 1 {
-			r.Log.Info("cannot have more than one default volumeSnapshotClass")
-			return false, errors.New("cannot have more than one default volumeSnapshotClass")
-		}
+	_, err := checkForOneDefaultSnapClass(&vsClassList, log)
+	if err != nil {
+		r.Log.Error(err, "error checking for one default volumeSnapshotClass")
+		return false, err
 	}
 
 	return true, nil
 }
 
-func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultStorageClass(log logr.Logger) (bool, error) {
+func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultVSBStorageClass(log logr.Logger) (bool, error) {
 	storageClassList := storagev1.StorageClassList{}
 	storageClassOptions := []client.ListOption{}
 
@@ -127,21 +127,47 @@ func (r *VolumeSnapshotBackupReconciler) checkForOneDefaultStorageClass(log logr
 		return false, err
 	}
 
-	numDefaultClasses := 0
-	for _, storageClass := range storageClassList.Items {
+	_, err := checkForOneDefaultStorageClass(&storageClassList, log)
+	if err != nil {
+		r.Log.Error(err, "error checking for one default storageClass")
+		return false, err
+	}
 
-		isDefaultClass, _ := storageClass.Annotations[storageClassDefaultKey]
-		boolIsDefault, _ := strconv.ParseBool(isDefaultClass)
+	return true, nil
+}
 
-		// found a default storageClass
-		if boolIsDefault {
-			numDefaultClasses++
-		}
+func (r *VolumeSnapshotRestoreReconciler) checkForOneDefaultVSRSnapClass(log logr.Logger) (bool, error) {
 
-		if numDefaultClasses > 1 {
-			r.Log.Info("cannot have more than one default storageClass")
-			return false, errors.New("cannot have more than one default storageClass")
-		}
+	vsClassList := snapv1.VolumeSnapshotClassList{}
+	vsClassOptions := []client.ListOption{}
+
+	// get all volumeSnapshotClasses in cluster
+	if err := r.List(r.Context, &vsClassList, vsClassOptions...); err != nil {
+		return false, err
+	}
+
+	_, err := checkForOneDefaultSnapClass(&vsClassList, log)
+	if err != nil {
+		r.Log.Error(err, "error checking for one default volumeSnapshotClass")
+		return false, err
+	}
+
+	return true, nil
+}
+
+func (r *VolumeSnapshotRestoreReconciler) checkForOneDefaultVSRStorageClass(log logr.Logger) (bool, error) {
+	storageClassList := storagev1.StorageClassList{}
+	storageClassOptions := []client.ListOption{}
+
+	// get all volumeSnapshotClasses in cluster
+	if err := r.List(r.Context, &storageClassList, storageClassOptions...); err != nil {
+		return false, err
+	}
+
+	_, err := checkForOneDefaultStorageClass(&storageClassList, log)
+	if err != nil {
+		r.Log.Error(err, "error checking for one default storageClass")
+		return false, err
 	}
 
 	return true, nil

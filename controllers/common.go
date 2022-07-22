@@ -3,9 +3,12 @@ package controllers
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/go-logr/logr"
+	snapv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
 	corev1 "k8s.io/api/core/v1"
+	storagev1 "k8s.io/api/storage/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -145,4 +148,46 @@ func ValidateResticSecret(resticsecret *corev1.Secret) error {
 func checkByteArrayIsEmpty(val []byte) bool {
 
 	return len(val) != 0
+}
+
+func checkForOneDefaultSnapClass(vsClassList *snapv1.VolumeSnapshotClassList, log logr.Logger) (bool, error) {
+
+	numDefaultClasses := 0
+	for _, vsClass := range vsClassList.Items {
+
+		isDefaultClass, _ := vsClass.Annotations[volumeSnapshotClassDefaultKey]
+		boolIsDefault, _ := strconv.ParseBool(isDefaultClass)
+
+		// found a default volumeSnapshotClass
+		if boolIsDefault {
+			numDefaultClasses++
+		}
+
+		if numDefaultClasses > 1 {
+			return false, errors.New("cannot have more than one default volumeSnapshotClass")
+		}
+	}
+
+	return true, nil
+}
+
+func checkForOneDefaultStorageClass(storageClassList *storagev1.StorageClassList, log logr.Logger) (bool, error) {
+
+	numDefaultClasses := 0
+	for _, storageClass := range storageClassList.Items {
+
+		isDefaultClass, _ := storageClass.Annotations[storageClassDefaultKey]
+		boolIsDefault, _ := strconv.ParseBool(isDefaultClass)
+
+		// found a default storageClass
+		if boolIsDefault {
+			numDefaultClasses++
+		}
+
+		if numDefaultClasses > 1 {
+			return false, errors.New("cannot have more than one default storageClass")
+		}
+	}
+
+	return true, nil
 }
