@@ -61,9 +61,9 @@ func (r *VolumeSnapshotRestoreReconciler) CreateReplicationDestination(log logr.
 func (r *VolumeSnapshotRestoreReconciler) buildReplicationDestination(replicationDestination *volsyncv1alpha1.ReplicationDestination, vsr *volsnapmoverv1alpha1.VolumeSnapshotRestore) error {
 
 	// get restic secret created by controller
-	resticSecretName := fmt.Sprintf("%s-secret", vsr.Name)
+	dmresticSecretName := vsr.Spec.ResticSecretRef.Name
 	resticSecret := corev1.Secret{}
-	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: resticSecretName}, &resticSecret); err != nil {
+	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: dmresticSecretName}, &resticSecret); err != nil {
 		r.Log.Error(err, "unable to fetch Restic Secret")
 		return err
 	}

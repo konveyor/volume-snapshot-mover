@@ -26,6 +26,8 @@ type VolumeSnapshotBackupSpec struct {
 	VolumeSnapshotContent corev1.ObjectReference `json:"volumeSnapshotContent,omitempty"`
 	// Namespace where the Velero deployment is present
 	ProtectedNamespace string `json:"protectedNamespace,omitempty"`
+	// Restic Secret reference for given BSL
+	ResticSecretRef corev1.LocalObjectReference `json:"resticSecretRef,omitempty"`
 }
 
 //TODO: Club Status into a new struct

@@ -154,7 +154,7 @@ func TestVolumeSnapshotMoverRestoreReconciler_ValidateVolumeSnapshotMoverRestore
 				},
 				Spec: volsnapmoverv1alpha1.VolumeSnapshotRestoreSpec{
 					ResticSecretRef: corev1.LocalObjectReference{
-						Name: resticSecret,
+						Name: "resticSecret",
 					},
 					ProtectedNamespace: "foo",
 					VolumeSnapshotMoverBackupref: volsnapmoverv1alpha1.VSBRef{
@@ -178,7 +178,7 @@ func TestVolumeSnapshotMoverRestoreReconciler_ValidateVolumeSnapshotMoverRestore
 				},
 				Spec: volsnapmoverv1alpha1.VolumeSnapshotRestoreSpec{
 					ResticSecretRef: corev1.LocalObjectReference{
-						Name: resticSecret,
+						Name: "resticSecret",
 					},
 					VolumeSnapshotMoverBackupref: volsnapmoverv1alpha1.VSBRef{
 						ResticRepository: "s3://sample-path/snapshots",
@@ -201,7 +201,7 @@ func TestVolumeSnapshotMoverRestoreReconciler_ValidateVolumeSnapshotMoverRestore
 				},
 				Spec: volsnapmoverv1alpha1.VolumeSnapshotRestoreSpec{
 					ResticSecretRef: corev1.LocalObjectReference{
-						Name: resticSecret,
+						Name: "resticSecret",
 					},
 					ProtectedNamespace: "foo",
 					VolumeSnapshotMoverBackupref: volsnapmoverv1alpha1.VSBRef{
@@ -225,7 +225,7 @@ func TestVolumeSnapshotMoverRestoreReconciler_ValidateVolumeSnapshotMoverRestore
 				},
 				Spec: volsnapmoverv1alpha1.VolumeSnapshotRestoreSpec{
 					ResticSecretRef: corev1.LocalObjectReference{
-						Name: resticSecret,
+						Name: "resticSecret",
 					},
 					ProtectedNamespace: "foo",
 					VolumeSnapshotMoverBackupref: volsnapmoverv1alpha1.VSBRef{
@@ -249,7 +249,7 @@ func TestVolumeSnapshotMoverRestoreReconciler_ValidateVolumeSnapshotMoverRestore
 				},
 				Spec: volsnapmoverv1alpha1.VolumeSnapshotRestoreSpec{
 					ResticSecretRef: corev1.LocalObjectReference{
-						Name: resticSecret,
+						Name: "resticSecret",
 					},
 					ProtectedNamespace: "foo",
 					VolumeSnapshotMoverBackupref: volsnapmoverv1alpha1.VSBRef{

@@ -59,7 +59,7 @@ metadata:
 spec:
   protectedNamespace: <protected-ns>
   resticSecretRef: 
-    name: restic-secret
+    name: dm-restic-secret
   dataMoverBackupRef:
     sourcePVCData: 
       name: <source-pvc-name>
@@ -121,7 +121,7 @@ $ cat << EOF > ./restic-secret.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: restic-secret
+  name: dm-restic-secret
 type: Opaque
 stringData:
   # The repository url (if using AWS s3)
@@ -146,7 +146,7 @@ $ oc create -n openshift-adp -f ./restic-secret.yaml
 - Make sure the application namespace is deleted, as well as the volumeSnapshotContent
   that was created by the Velero CSI plugin.
 
-- If needed, create a Restic secret named `restic-secret` in the protected namespace following the above steps.
+- If needed, create a Restic secret named `dm-restic-secret` in the protected namespace following the above steps.
 
 - Run the controller by executing `make run`
 

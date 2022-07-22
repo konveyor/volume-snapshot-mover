@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	"strings"
@@ -41,9 +42,16 @@ func (r *VolumeSnapshotBackupReconciler) CreateVSBResticSecret(log logr.Logger) 
 		r.Log.Error(err, "unable to fetch PVC")
 		return false, err
 	}
+
+	// get restic secret name
+	credName := vsb.Spec.ResticSecretRef.Name
+	if credName == "" {
+		return false, errors.New("restic secret name cannot be empty")
+	}
+
 	// get restic secret from user
 	resticSecret := corev1.Secret{}
-	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: resticSecretName}, &resticSecret); err != nil {
+	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: credName}, &resticSecret); err != nil {
 		r.Log.Error(err, "unable to fetch Restic Secret")
 		return false, err
 	}
@@ -109,9 +117,16 @@ func (r *VolumeSnapshotRestoreReconciler) CreateVSRResticSecret(log logr.Logger)
 		r.Log.Error(err, "unable to fetch VolumeSnapshotRestore CR")
 		return false, err
 	}
+
+	// get restic secret name
+	// get restic secret name
+	credName := vsr.Spec.ResticSecretRef.Name
+	if credName == "" {
+		return false, errors.New("restic secret name cannot be empty")
+	}
 	// get restic secret from user
 	resticSecret := corev1.Secret{}
-	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: resticSecretName}, &resticSecret); err != nil {
+	if err := r.Get(r.Context, types.NamespacedName{Namespace: r.NamespacedName.Namespace, Name: credName}, &resticSecret); err != nil {
 		r.Log.Error(err, "unable to fetch Restic Secret")
 		return false, err
 	}

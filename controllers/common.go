@@ -13,7 +13,6 @@ const (
 	VSBLabel                      = "datamover.oadp.openshift.io/vsb"
 	VSRLabel                      = "datamover.oadp.openshift.io/vsr"
 	DummyPodImage                 = "quay.io/konveyor/rsync-transfer:latest"
-	resticSecretName              = "restic-secret"
 	volumeSnapshotClassDefaultKey = "snapshot.storage.kubernetes.io/is-default-class"
 	storageClassDefaultKey        = "storageclass.kubernetes.io/is-default-class"
 )
@@ -110,11 +109,15 @@ func BuildResticSecret(givensecret *corev1.Secret, secret *corev1.Secret, restic
 	return nil
 }
 
+// TODO: GCP & Azure validations
 func ValidateResticSecret(resticsecret *corev1.Secret) error {
 	if resticsecret == nil {
 		return errors.New("empty restic secret. Please create a restic secret")
 	}
 
+	if resticsecret.Data == nil {
+		return errors.New("secret data is empty")
+	}
 	for key, val := range resticsecret.Data {
 		switch key {
 		case AWSAccessKey:

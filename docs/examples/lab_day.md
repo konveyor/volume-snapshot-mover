@@ -112,7 +112,7 @@ spec:
     veleroImageFqin: 'quay.io/emcmulla/velero:test2'
 ```
 
-* Create a [restic secret](https://volsync.readthedocs.io/en/stable/usage/restic/index.html#id2) named `restic-secret` in the adp namespace:
+* Create a [restic secret](https://volsync.readthedocs.io/en/stable/usage/restic/index.html#id2) named `dm-restic-secret` in the adp namespace:
 
   `$ oc create -n openshift-adp -f ./restic-secret.yaml`
 
@@ -237,7 +237,7 @@ spec:
       size: 10Gi
   protectedNamespace: openshift-adp
   resticSecretRef:
-    name: restic-secret
+    name: dm-restic-secret
 status:
   completed: true
   conditions:

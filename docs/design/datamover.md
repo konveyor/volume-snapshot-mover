@@ -109,7 +109,7 @@ metadata:
 spec:
   protectedNamespace: <ns>
   resticSecretRef:  // optional
-    name: restic-secret  
+    name: dm-restic-secret  
   dataMoverBackupRef:
     sourcePVCData: 
       name: <pvc_name>
@@ -128,7 +128,7 @@ metadata:
 spec:
   protectedNamespace: <ns>
   resticSecretRef:  
-    name: restic-secret  
+    name: dm-restic-secret  
   dataMoverBackupRef:
     sourcePVCData: 
       name: <pvc_name>
@@ -168,7 +168,7 @@ stringData:
 
 Custom velero CSI plugin will be responsible for creating `VolumeSnapshotBackup` & `VolumeSnapshotRestore` CRs. 
 
-Once a VolumeSnapshotBackup CR gets created, the controller will create the corresponding `ReplicationSource` CR in the protected namespace. VolSync watches for the creation of `ReplicationSource` CR and copies the PVC data to the restic repository mentioned in the `restic-secret`.  
+Once a VolumeSnapshotBackup CR gets created, the controller will create the corresponding `ReplicationSource` CR in the protected namespace. VolSync watches for the creation of `ReplicationSource` CR and copies the PVC data to the restic repository mentioned in the `dm-restic-secret`.  
 ```
 apiVersion: volsync.backube/v1alpha1
 kind: ReplicationSource
