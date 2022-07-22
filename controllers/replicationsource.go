@@ -84,7 +84,9 @@ func (r *VolumeSnapshotBackupReconciler) buildReplicationSource(replicationSourc
 		Restic: &volsyncv1alpha1.ReplicationSourceResticSpec{
 			Repository: resticSecret.Name,
 			ReplicationSourceVolumeOptions: volsyncv1alpha1.ReplicationSourceVolumeOptions{
-				CopyMethod: volsyncv1alpha1.CopyMethodNone,
+				CopyMethod:              volsyncv1alpha1.CopyMethodNone,
+				StorageClassName:        &vsb.Status.SourcePVCData.StorageClassName,
+				VolumeSnapshotClassName: &vsb.Status.VolumeSnapshotClassName,
 			},
 		},
 	}

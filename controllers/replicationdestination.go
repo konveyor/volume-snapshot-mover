@@ -70,7 +70,6 @@ func (r *VolumeSnapshotRestoreReconciler) buildReplicationDestination(replicatio
 
 	stringCapacity := vsr.Spec.VolumeSnapshotMoverBackupref.BackedUpPVCData.Size
 	capacity := resource.MustParse(stringCapacity)
-
 	// build ReplicationDestination
 	replicationDestinationSpec := volsyncv1alpha1.ReplicationDestinationSpec{
 		Trigger: &volsyncv1alpha1.ReplicationDestinationTriggerSpec{
@@ -83,7 +82,9 @@ func (r *VolumeSnapshotRestoreReconciler) buildReplicationDestination(replicatio
 				AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
 				CopyMethod:  volsyncv1alpha1.CopyMethodSnapshot,
 				// let replicationDestination create PVC
-				Capacity: &capacity,
+				Capacity:                &capacity,
+				StorageClassName:        &vsr.Spec.VolumeSnapshotMoverBackupref.BackedUpPVCData.StorageClassName,
+				VolumeSnapshotClassName: &vsr.Spec.VolumeSnapshotMoverBackupref.BackedUpPVCData.StorageClassName,
 			},
 		},
 	}
